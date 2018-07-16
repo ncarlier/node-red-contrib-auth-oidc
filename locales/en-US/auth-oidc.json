@@ -1,0 +1,24 @@
+{
+  "auth-oidc": {
+    "label": {
+      "name": "Name",
+      "discovery": "Discovery URL",
+      "client_id": "Client Id"
+    },
+    "status": {
+      "no-access-token": "No Acces Token",
+      "bad-access-token": "Bad Acces Token",
+      "bad-discovery-request": "Bad Discovery request",
+      "bad-discovery-response": "Bad Discovery response",
+      "bad-access-token": "Bad Acces Token",
+      "ready": "Ready"
+    },
+    "error": {
+      "no-access-token": "Access token not found in the request",
+      "bad-access-token": "Access token is not valid",
+      "bad-discovery-request": "Bad discovery request",
+      "bad-discovery-response": "Bad discovery response",
+      "bad-discovery-endpoint": "Unable to verify token. Discovery endpoint is not valid."
+    }
+  }
+}

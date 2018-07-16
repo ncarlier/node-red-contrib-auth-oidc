@@ -1,0 +1,68 @@
+<!--
+  Copyright 2018 Nicolas Carlier.
+
+  Licensed under the Apache License, Version 2.0 (the "License");
+  you may not use this file except in compliance with the License.
+  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing, software
+  distributed under the License is distributed on an "AS IS" BASIS,
+  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  See the License for the specific language governing permissions and
+  limitations under the License.
+-->
+
+<script type="text/x-red" data-template-name="auth-oidc">
+  <div class="form-row">
+    <label for="node-input-discovery">
+      <i class="fa fa-globe"></i>
+      <span data-i18n="auth-oidc.label.discovery"></span>
+    </label>
+    <input type="url" id="node-input-discovery" data-i18n="[placeholder]auth-oidc.label.discovery">
+  </div>
+  <div class="form-row">
+    <label for="node-input-name">
+      <i class="fa fa-tag"></i>
+      <span data-i18n="auth-oidc.label.name"></span>
+    </label>
+    <input type="text" id="node-input-name" data-i18n="[placeholder]auth-oidc.label.name">
+  </div>
+</script>
+
+<script type="text/x-red" data-help-name="auth-oidc">
+<p>
+This node expects to find the access token into the following message property:
+<code>msg.req.headers['Authorization']</code>.
+</p>
+<p>
+The access token is validated with public keys extracted form the OpenID
+Connect discovery URL.
+</p>
+<p>
+If the access token is valid, its decoded content is stored into the following
+message property: <code>msg.token</code>
+</p>
+</script>
+
+<script type="text/javascript">
+RED.nodes.registerType('auth-oidc',{
+  category: 'function',
+  color: '#e7e7ae',
+  defaults: {
+    name: {value: ''},
+    discovery: {value: '', required: true}
+  },
+  inputs: 1,
+  outputs: 1,
+  icon: 'openid.png',
+  label: function() {
+    return this.name || 'Auth OIDC';
+  },
+  labelStyle: function() {
+    return this.name ? 'node_label_italic' : '';
+  }
+});
+</script>
+
