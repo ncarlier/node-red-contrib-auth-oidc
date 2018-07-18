@@ -23,8 +23,7 @@ https://accounts.google.com/.well-known/openid-configuration
 This node extract and validate the access token from HTTP headers
 (`Authorization: Bearer XXX`).
 
-Decoded token (JWT) is stored into the property `msg.token`.
-The token is decoded (JWT) and stored into the message property: `msg.token`.
+Decoded token (JWT) is stored into the message property: `msg.access_token`.
 
 [nodered]: https://nodered.org/
 [node-openid-client]: https://github.com/panva/node-openid-client

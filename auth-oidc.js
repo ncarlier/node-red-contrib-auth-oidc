@@ -87,7 +87,7 @@ module.exports = function (RED) {
           return this.send(msg)
         }
         delete msg.error
-        msg.token = jwt
+        msg.access_token = jwt
         this.status({})
         this.send(msg)
       })
