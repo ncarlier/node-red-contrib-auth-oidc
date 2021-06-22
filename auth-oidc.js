@@ -19,7 +19,7 @@ module.exports = function (RED) {
 
   const jwks = require('jwks-rsa')
   const nJwt = require('njwt')
-  const request = require('request')
+  const https = require('https')
 
   function AuthOIDCNode (n) {
     RED.nodes.createNode(this, n)
@@ -33,40 +33,54 @@ module.exports = function (RED) {
       }
     }
 
-    request.get({url: this.discovery, json: true}, (err, res, body) => {
-      if (err) {
+    https.get(this.discovery, res => {
+      let data = ''
+      res.setEncoding('utf8')
+      res.on('data', chunk => {
+        data += chunk
+      })
+      res.on('end', () => {
+        let body = null
+        try {
+          body = JSON.parse(data)
+        } catch (err) {
+          console.error('Discovery error: bad response: %j', err)
+          this.status({fill: 'red', shape: 'ring', text: 'auth-oidc.status.bad-discovery-response'})
+          return this.error(RED._('auth-oidc.error.bad-discovery-response'))
+        }
+        if (!body || !body.jwks_uri) {
+          console.error('Discovery error: bad response: %j', body)
+          this.status({fill: 'red', shape: 'ring', text: 'auth-oidc.status.bad-discovery-response'})
+          return this.error(RED._('auth-oidc.error.bad-discovery-response'))
+        }
+        console.log('JWKS URI: %j', body.jwks_uri)
+
+        const options = {
+          cache: true,
+          cacheMaxAge: 60 * 60 * 1000,
+          cacheMaxEntries: 3,
+          jwksRequestsPerMinute: 10,
+          rateLimit: true
+        }
+
+        const jwksClient = jwks(Object.assign(
+          {},
+          options,
+          {jwksUri: body.jwks_uri})
+        )
+        this.verifier = nJwt.createVerifier()
+          .setSigningAlgorithm('RS256')
+          .withKeyResolver((kid, cb) => {
+            jwksClient.getSigningKey(kid, (err, key) => {
+              cb(err, key && (key.publicKey || key.rsaPublicKey))
+            })
+          })
+        this.status({fill: 'blue', shape: 'ring', text: 'auth-oidc.status.ready'})
+      }).on('error', err => {
         console.log('Discovery error: %j', err)
         this.status({fill: 'red', shape: 'ring', text: 'auth-oidc.status.bad-discovery-request'})
         return this.error(RED._('auth-oidc.error.bad-discovery-request'))
-      }
-      if (!body || !body.jwks_uri) {
-        console.log('Discovery error: bad response: %j', body)
-        this.status({fill: 'red', shape: 'ring', text: 'auth-oidc.status.bad-discovery-response'})
-        return this.error(RED._('auth-oidc.error.bad-discovery-response'))
-      }
-      console.log('JWKS URI: %j', body.jwks_uri)
-
-      const options = {
-        cache: true,
-        cacheMaxAge: 60 * 60 * 1000,
-        cacheMaxEntries: 3,
-        jwksRequestsPerMinute: 10,
-        rateLimit: true
-      }
-
-      const jwksClient = jwks(Object.assign(
-        {},
-        options,
-        {jwksUri: body.jwks_uri})
-      )
-      this.verifier = nJwt.createVerifier()
-        .setSigningAlgorithm('RS256')
-        .withKeyResolver((kid, cb) => {
-          jwksClient.getSigningKey(kid, (err, key) => {
-            cb(err, key && (key.publicKey || key.rsaPublicKey))
-          })
-        })
-      this.status({fill: 'blue', shape: 'ring', text: 'auth-oidc.status.ready'})
+      })
     })
 
     this.on('input', msg => {
