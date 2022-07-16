@@ -20,6 +20,7 @@ module.exports = function (RED) {
   const jwks = require('jwks-rsa')
   const nJwt = require('njwt')
   const https = require('https')
+  const http = require('http')
 
   function AuthOIDCNode (n) {
     RED.nodes.createNode(this, n)
@@ -32,8 +33,11 @@ module.exports = function (RED) {
         return cb(RED._('auth-oidc.error.bad-discovery-endpoint'))
       }
     }
+    
+    const scheme = new URL(this.discovery).protocol
+    const protocol = (scheme == 'https:' ? https : http)
 
-    https.get(this.discovery, res => {
+    protocol.get(this.discovery, res => {
       let data = ''
       res.setEncoding('utf8')
       res.on('data', chunk => {

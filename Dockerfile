@@ -2,16 +2,22 @@
 # Node-RED server with OpenID Auth plugin
 ##########################################
 
-FROM node:8-onbuild
+FROM nodered/node-red
 
-RUN npm install -g --unsafe-perm node-red && \
-    mkdir ~/.node-red && \
-    npm link
+USER root
 
-RUN cd ~/.node-red && npm link node-red-contrib-auth-oidc
+WORKDIR /app
 
-# Ports
-EXPOSE 1880
+COPY ["package.json", "package-lock.json*", "./"]
 
-ENTRYPOINT ["node-red"]
+RUN npm install
 
+COPY . .
+
+RUN npm link
+
+USER node-red
+
+WORKDIR /usr/src/node-red
+
+RUN npm link node-red-contrib-auth-oidc

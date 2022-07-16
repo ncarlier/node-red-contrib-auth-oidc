@@ -4,7 +4,7 @@
 APPNAME:=node-red-contrib-auth-oidc
 
 # Base image
-BASEIMAGE=node:8-onbuild
+BASEIMAGE=nodered/node-red
 
 # Default configuration
 ENV_FLAGS?=-e NODE_ENV=development
