@@ -1,10 +1,10 @@
 {
   "name": "node-red-contrib-auth-oidc",
-  "version": "0.0.3",
+  "version": "1.0.0",
   "description": "Node-RED node to add OpenID Connect authentication to HTTP nodes",
   "dependencies": {
-    "jwks-rsa": "^2.1.4",
-    "njwt": "^1.2.0"
+    "jwks-rsa": "^3.1.0",
+    "njwt": "^2.0.1"
   },
   "repository": {
     "type": "git",
