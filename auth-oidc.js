@@ -34,10 +34,17 @@ module.exports = function (RED) {
       }
     }
     
-    const scheme = new URL(this.discovery).protocol
-    const protocol = (scheme == 'https:' ? https : http)
+    let url
+    try {
+      url = new URL(this.discovery)
+    } catch (err) {
+      console.error('Discovery error: invalid URL: %j', err)
+      this.status({fill: 'red', shape: 'ring', text: 'auth-oidc.status.bad-discovery-request'})
+      return this.error(RED._('auth-oidc.error.bad-discovery-request'))
+    }
+    const protocol = (url.protocol == 'https:' ? https : http)
 
-    protocol.get(this.discovery, res => {
+    const req = protocol.get(this.discovery, res => {
       let data = ''
       res.setEncoding('utf8')
       res.on('data', chunk => {
@@ -85,6 +92,12 @@ module.exports = function (RED) {
         this.status({fill: 'red', shape: 'ring', text: 'auth-oidc.status.bad-discovery-request'})
         return this.error(RED._('auth-oidc.error.bad-discovery-request'))
       })
+    })
+
+    req.on('error', err => {
+      console.error('Discovery error: %j', err)
+      this.status({fill: 'red', shape: 'ring', text: 'auth-oidc.status.bad-discovery-request'})
+      this.error(RED._('auth-oidc.error.bad-discovery-request'))
     })
 
     this.on('input', msg => {
