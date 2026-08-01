@@ -3,8 +3,11 @@
   "version": "1.0.0",
   "description": "Node-RED node to add OpenID Connect authentication to HTTP nodes",
   "dependencies": {
-    "jwks-rsa": "^3.1.0",
+    "jwks-rsa": "^4.1.0",
     "njwt": "^2.0.1"
+  },
+  "overrides": {
+    "uuid": "^11.1.1"
   },
   "repository": {
     "type": "git",
